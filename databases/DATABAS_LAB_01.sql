@@ -1,0 +1,149 @@
+CREATE DATABASE Filmography
+GO 
+USE Filmography
+
+CREATE TABLE Directors
+(	
+	ID_DIRECTOR INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+	NAME VARCHAR(50) NOT NULL, 
+	BIRTHDATE DATETIME NOT NULL, 
+	BIRTHPLACE VARCHAR(50) NOT NULL,
+)
+
+CREATE TABLE StreamingServices
+(
+	ID_STREAMING_SERVICE INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+	NAME VARCHAR(50) NOT NULL,
+	LAUNCH_DATE DATETIME NOT NULL,
+	PARENT VARCHAR(50) NOT NULL,
+)
+
+CREATE TABLE Movies
+(
+	ID_MOVIE INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+	NAME VARCHAR(50) NOT NULL,
+	RELEASE_DATE DATETIME NOT NULL,
+	GENRE VARCHAR(50) NOT NULL,
+	RATING FLOAT NOT NULL CHECK(RATING >= 1 AND RATING <=10),
+	ID_DIRECTOR INT NOT NULL,
+	ID_STREAMING_SERVICE INT NOT NULL,
+	CONSTRAINT fk_director_movie FOREIGN KEY(ID_DIRECTOR) REFERENCES Directors(ID_DIRECTOR),
+	CONSTRAINT fk_streaming_service_movie FOREIGN KEY(ID_STREAMING_SERVICE) REFERENCES StreamingServices(ID_STREAMING_SERVICE)
+
+)
+
+CREATE TABLE Actors
+(
+	ID_ACTOR INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+	NAME VARCHAR(50) NOT NULL, 
+	BIRTHDATE DATETIME NOT NULL, 
+	BIRTHPLACE VARCHAR(50) NOT NULL
+
+)
+
+CREATE TABLE Roles
+(
+	ID_MOVIE INT NOT NULL,
+	ID_ACTOR INT NOT NULL, 
+	CONSTRAINT fk_roles_movie FOREIGN KEY(ID_MOVIE) REFERENCES Movies(ID_MOVIE),
+	CONSTRAINT fk_roles_actor FOREIGN KEY(ID_ACTOR) REFERENCES Actors(ID_ACTOR),
+	CONSTRAINT pk_role PRIMARY KEY(ID_MOVIE, ID_ACTOR)
+)
+
+
+CREATE Table Viewers
+(
+	ID_VIEWER INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+	NAME VARCHAR(50) NOT NULL,
+	BIRTHDATE DATETIME NOT NULL
+)
+
+
+CREATE TABLE ViewedMovies
+(
+	ID_MOVIE INT NOT NULL, 
+	ID_VIEWER INT NOT NULL,
+	CONSTRAINT fk_viewed_movies_movie FOREIGN KEY(ID_MOVIE) REFERENCES Movies(ID_MOVIE),
+	CONSTRAINT fk_viewed_movies_viewer FOREIGN KEY(ID_VIEWER) REFERENCES Viewers(ID_VIEWER),
+	CONSTRAINT pk_viewed_movie PRIMARY KEY(ID_MOVIE, ID_VIEWER)
+)
+
+-- INSERT
+
+--Insert data into Directors table
+
+INSERT INTO Directors (NAME, BIRTHDATE, BIRTHPLACE) VALUES ('Steven Spilberg', '19230818 11:30:00 PM', 'UK'),
+('Roman Polanski','19451211 12:15:40 AM', 'Italy'), ('David Fincher', '19631210 08:30:00 AM', 'USA')
+
+SELECT * FROM Directors
+
+
+--Insert data into StreamingServices table
+
+INSERT INTO StreamingServices (NAME, LAUNCH_DATE, PARENT) VALUES ('HBO', '19721201  10:00:00 AM', 'AB'), ('Netflix', 
+'20070101 10:00:00 AM', 'AB1'), ('ABC', '19900202 11:00:00 AM', 'CD')
+
+SELECT * FROM StreamingServices
+
+
+--Insert data into Movies table
+
+INSERT INTO Movies (NAME, RELEASE_DATE , GENRE, RATING, ID_DIRECTOR, ID_STREAMING_SERVICE) VALUES 
+('Schindler s list', '19930618 10:30:00 AM', 'drama', 8.9, 1 ,1),('The Pianist','20010303 10:00:00 AM','drama',8.5,2,2),
+('The Grande Hotel Budapest', '20050212 09:00:00 PM', 'drama and romance', 7.6,2,2),
+('Au Revoir les Enfants', '19870603 08:00:00 AM', 'war and drama', 7.5,3,3),
+('La vita e bella', '19970908 06:00:00 PM', 'war and drama', 9.2,2,2), 
+('Fight Club', '19991020 08:00:00 AM','thriller and drama',8.8,3,2)
+
+SELECT * FROM Directors
+SELECT * FROM StreamingServices
+SELECT * FROM Movies
+
+--Insert data into Actors table
+
+INSERT INTO Actors (NAME,BIRTHDATE, BIRTHPLACE) VALUES ('Liam Neeson', '19500818 11:30:00 PM', 'UK'),
+('Adrien Brody','19751211 12:15:40 AM', 'Italy'), ('Meryl Streep', '19500722 11:00:00 AM', 'USA'), 
+('Roberto Benigni', '19600405 07:30:50 AM', 'Italy'), ('Brad Pitt', '19631210 08:30:00 AM', 'USA')
+
+SELECT * FROM Actors
+
+
+--Insert data into Roles table
+
+INSERT INTO Roles (ID_MOVIE, ID_ACTOR) VALUES (1,1),(2,2),(3,2),(5,1),(6,5)
+
+SELECT * FROM Roles
+
+
+--Insert data into Viewers table
+
+INSERT INTO Viewers (NAME, BIRTHDATE) VALUES ('John', '19631210 08:30:00 AM'), ('Alex', '19500818 11:30:00 PM'), 
+('Anne', '19751211 12:15:40 AM'), ('Kim', '19991020 08:00:00 AM'), ('Jacob', '19991020 08:00:00 AM')
+
+SELECT * FROM Viewers
+
+
+--Insert data into ViewedMovies table
+
+INSERT INTO ViewedMovies (ID_MOVIE, ID_VIEWER) VALUES (1,1),(2,4),(3,4),(1,4),(6,3),(5,2)
+
+SELECT * FROM ViewedMovies
+
+
+--UPDATE
+
+UPDATE Viewers SET NAME='Johnathan' WHERE NAME='JOHN' AND NOT(ID_VIEWER IS NULL)
+SELECT * FROM Viewers
+
+--DELETE
+DELETE FROM Movies WHERE RATING=7.5 AND GENRE='war and drama'
+SELECT * FROM Movies
+
+--OPERATORS 
+INSERT INTO Movies (NAME, RELEASE_DATE , GENRE, RATING, ID_DIRECTOR, ID_STREAMING_SERVICE) VALUES 
+('Detachment', '20071210 08:30:00 AM', 'drama', 7.8, 2, 2), ('Midnight in Paris', '20091111 10:00:00 AM', 'romance', 7.5, 2,2)
+DELETE FROM Movies WHERE GENRE<>'drama' AND GENRE<>'war and drama' AND RATING<=7.5
+SELECT * FROM Movies
+INSERT INTO StreamingServices (NAME, LAUNCH_DATE, PARENT) VALUES ('Amazon Prime', '20001010 11:00:00 AM', 'AMP')
+UPDATE StreamingServices SET PARENT='AMPR' WHERE ID_STREAMING_SERVICE>=4 OR PARENT LIKE '%P'
+SELECT * FROM StreamingServices
